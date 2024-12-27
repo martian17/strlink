@@ -1,9 +1,11 @@
 const NODE_UTF16MAX = 1<<27-1;
 
 export class StringBuilder{
-    u16 = new Uint16Array(512);
+    u16 = new Uint16Array(500);
     length = 0;
     position = 0;
+    queue = [];
+    queuesize = 0;
     static decoder = new TextDecoder("utf-16le");
     reserve(end){
         if(end <= this.u16.length){
@@ -33,15 +35,26 @@ export class StringBuilder{
         u16n.set(this.u16);
         this.u16 = u16n;
     }
-    append(str){
-        this.reserveEnd(str.length);
+    flush(){
+        this.reserveEnd(this.queuesize);
         let position = this.position;
-        for(let i = 0; i < str.length; i++){
-            this.u16[position++] = str.charCodeAt(i);
+        for(let str of this.queue){
+            for(let i = 0; i < str.length; i++){
+                this.u16[position++] = str.charCodeAt(i);
+            }
         }
         this.position = position;
+        this.queue = [];
+        this.queuesize = 0;
+    }
+    append(str){
+        this.queue.push(str);
+        this.queuesize += str.length;
+        if(this.queuesize > 1000)
+            this.flush();
     }
     toString(){
+        this.flush();
         const decoder = this.constructor.decoder;
         const len = this.length;
         if(len < NODE_UTF16MAX){

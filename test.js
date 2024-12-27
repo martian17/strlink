@@ -1,4 +1,4 @@
-import { StringBuilder } from "./index.js";
+import { StringBuilder } from "./dumb.js";
 
 const test = function(limit){
     const t1 = performance.now();
@@ -8,6 +8,7 @@ const test = function(limit){
     }
     const t2 = performance.now();
     console.log(`+= ${t2-t1} ${res1[res1.length-1]}`);
+
     const t3 = performance.now();
     let sb = new StringBuilder;
     for(let i = 0; i < limit; i++){
@@ -18,6 +19,6 @@ const test = function(limit){
     console.log(`sb ${t4-t3} ${res2[res2.length-1]}`);
 }
 
-test(10);
+test(10000);
 
 
